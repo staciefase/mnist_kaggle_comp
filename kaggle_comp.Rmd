@@ -1,0 +1,81 @@
+```{r}
+library(keras3)
+library(readr)
+```
+
+```{r}
+#i made a subset of the training and testing data so I could work with it bc RS kept crashing grrr i need to get off the basic plan
+
+#train <- read_csv("train.csv") #pull in training data
+#train_subset <- train[1:50, ] #only pull first 50 images
+
+#write train_subset to csv just for ease of training
+#write.csv(train_subset, file = "train_subset.csv", row.names = FALSE)
+#rm(train) #remove large file from memory
+
+#same thing w test data
+
+#test <- read_csv("test.csv") #pull in test data
+#test_subset <- test[1:50, ] #only pull first 50 images
+
+#write test_subset to csv just for ease of testing
+#write.csv(test_subset, file = "test_subset.csv", row.names = FALSE)
+#rm(test) #remove large file from memory
+```
+
+```{r}
+#call in test and training subsets
+train_subset <- read_csv("train_subset.csv")
+test_subset <- read_csv("test_subset.csv")
+```
+
+```{r}
+#split out x (pixel vals) and y (image values) for keras for training
+y <- train_subset$label 
+x <- as.matrix(train_subset[, -1]) 
+x <- apply(x, 2, as.numeric) #just in case
+```
+
+```{r}
+x <- x/255 #normalize/flatten data
+# if using dense NN ok to keep x as is - must reshape x if want to use CNN
+```
+
+```{r}
+#time to build the model
+
+model <- keras_model_sequential() |> #uses sequential set of layers for each evaluation bc model expects flattened 1D vector output
+  layer_dense(units=128, activation = "relu", input_shape = 784) |> #first layer of 128 neurons, relu algorithm better for nonlinear learning than sigmoid - added input shape to account for no pre-flattening
+  layer_dense(units=64, activation = "relu") |> #second layer of 64 neurons, also w/ relu
+  layer_dense(units=10, activation = "softmax") #last layer of 10 neurons (1 for each number prediction 0-9, with "softmax" which converts output to probabilities that sum up to 1)
+
+summary(model)
+```
+
+```{r}
+#configures model for training by specifying what metrics to track and how it should learn
+
+#optimizer Uses Adam optimizer - combines momentum and adaptive learning rates to smooth out gradient descent and control for diminished returns. https://www.geeksforgeeks.org/deep-learning/adam-optimizer/
+
+model |> compile(
+  optimizer = optimizer_adam(learning_rate = 1e-3), #how weights are updated, will start at 0.001 and go from there
+  loss      = "sparse_categorical_crossentropy",  #how errors will be measured, sparse means labels are integers, not one-hot encoded (1/0), to measure how far predicted probabilities are from actuals
+  metrics   = "accuracy" #what performance to track
+)
+
+```
+
+```{r}
+#time to train
+history <- model |> fit( 
+  x = x, #images
+  y = y, #labels (digis 0-9)
+  epochs = 5, #model will see dataset 5 times
+  batch_size = 10, #processes 10 samples at a time
+  validation_split = 0.1, #reserves 10% of data for validation to check over-fitting
+  verbose = 2 #prints progress in readable format
+)
+
+#now let's plot it 
+plot(history) #history stores loss + accuracy for each epoch
+```
