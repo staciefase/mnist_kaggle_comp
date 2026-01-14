@@ -14,14 +14,14 @@ Broadly, what I did was this:
 - Ran it against my training data and generated validation and accuracy metrics
 
 What I still need to do:
-- Run it against test data (which is in a different format than the training data)
-- Validate that the model works against test data
-- Check the accuracy and confusion matrix
-- Optimize
-- Submit the sample submission to the kaggle platform for eval
+- Run it against test data (which is in a different format than the training data) - done
+- Validate that the model works against test data - done
+- Check the accuracy and confusion matrix - found out I can't bc the kaggle version purposely doesn't incl labels for test data - they want you to submit it and then they'll validate. which makes sense now that I think about it, but it didn't occur to me until later.
+- Optimize - pending feedback 
+- Submit the sample submission to the kaggle platform for eval - still need to do this
 
 Probs I keep running into
-- Memory issues mostly
+- Memory issues mostly - finally upgraded my plan so that's helped.
 - I'm doing this in R, not Python, so it's slow going...sigh
 - This is my first time doing a neural network and I've been told that a CNN is a better approach than the way I'm doing that. So probably something to explore next.
 - I don't really know what I'm doing so it's a lot of trial and error. Which I suppose is the point. Still.
